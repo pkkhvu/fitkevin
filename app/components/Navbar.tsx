@@ -3,7 +3,7 @@ import Link from "next/link";
 
 const Navbar = () => {
   return (
-    <div className="navbar bg-base-100 mt-15">
+    <div className="navbar bg-sky-200 mt-15">
       <div className="navbar-start">
         <div className="dropdown">
           <div tabIndex={0} role="button" className="btn btn-ghost btn-circle">
@@ -39,7 +39,9 @@ const Navbar = () => {
         </div>
       </div>
       <div className="navbar-center">
-        <a className="btn btn-ghost text-xl">Kevin's Calorie Tracker</a>
+        <a className="btn btn-ghost text-xl">
+          <Link href="/">Kevin's Calorie Tracker</Link>
+        </a>
       </div>
       <div className="navbar-end">
         <button className="btn btn-ghost btn-circle">
