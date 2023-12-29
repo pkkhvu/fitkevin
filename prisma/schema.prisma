@@ -41,3 +41,19 @@ model Account {
 
   @@unique([provider, providerAccountId])
 }
+
+model Food {
+  id                     String    @id @default(auto()) @map("_id") @db.ObjectId
+  name                   String
+  calories               Float
+  serving_size_g         Float
+  fat_total_g            Float
+  fat_saturated_g        Float
+  protein_g              Float
+  sodium_mg              Int
+  potassium_mg           Int
+  cholesterol_mg         Int
+  carbohydrates_total_g  Float
+  fiber_g                Float
+  sugar_g                Float
+}

@@ -44,7 +44,11 @@ const Navbar = () => {
       </div>
       <div className="navbar-center">
         <a className="btn btn-ghost text-xl">
-          <Link href="/">Kevin's Calorie Tracker</Link>
+          {session?.status === "authenticated" ? (
+            <Link href="/dashboard">Kevin's Calorie Tracker</Link>
+          ) : (
+            <Link href="/">Kevin's Calorie Tracker</Link>
+          )}
         </a>
       </div>
       <div className="navbar-end">
