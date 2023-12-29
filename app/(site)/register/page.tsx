@@ -1,12 +1,14 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import axios from "axios";
 import { toast } from "react-hot-toast";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 
 export default function Register() {
+  const router = useRouter();
+
   const [data, setData] = useState({
     name: "",
     email: "",
@@ -116,12 +118,13 @@ export default function Register() {
           </form>
 
           <p className="mt-10 text-center text-sm text-gray-500">
-            Already an account?{" "}
+            Already have an account or
+            <br /> want to sign in with Google? <br />
             <a
               href="/login"
               className="font-semibold leading-6 text-sky-600 hover:text-sky-500"
             >
-              Sign in
+              Click here
             </a>
           </p>
         </div>

@@ -13,16 +13,22 @@ export default async function Home() {
         <div>
           Enjoy using my calorie tracker because I'm not willing to buy a
           MyFitnessPal subscription anymore.
+          <p className="mt-5">
+            Click
+            <a className="text-red-500 font-bold"> sign up </a>
+            or <a className="text-sky-600 font-bold">sign in </a>
+            to get started!
+          </p>
         </div>
         <div className="mt-10 flex justify-center">
           <div>
-            <button className="bg-blue-500 p-5 rounded-xl text-white hover:bg-blue-700 shadow-2xl font-semibold mx-7">
-              <Link href="/trackYourWeight">Track Your Weight</Link>
+            <button className="bg-red-500 py-5 px-10 rounded-xl text-white hover:bg-red-700 shadow-2xl font-semibold mx-7">
+              <Link href="/register">SIGN UP</Link>
             </button>
           </div>
           <div>
-            <button className="bg-slate-700 p-5 rounded-xl text-white hover:bg-slate-500 shadow-2xl font-semibold mx-7">
-              <Link href="/trackYourCalories">Track Your Calories</Link>
+            <button className="bg-sky-700 py-5 px-10 rounded-xl text-white hover:bg-sky-500 shadow-2xl font-semibold mx-7">
+              <Link href="/login">SIGN IN</Link>
             </button>
           </div>
         </div>
