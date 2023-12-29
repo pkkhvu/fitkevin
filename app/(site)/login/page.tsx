@@ -1,23 +1,36 @@
 "use client";
 
-import { useState } from "react";
-import axios from "axios";
+import { useState, useEffect } from "react";
+import { signIn, useSession } from "next-auth/react";
 import { toast } from "react-hot-toast";
+import { useRouter } from "next/navigation";
 import Image from "next/image";
 
-export default function Register() {
+export default function Login() {
+  const session = useSession();
+  const router = useRouter();
   const [data, setData] = useState({
-    name: "",
     email: "",
     password: "",
   });
 
-  const registerUser = async (e) => {
+  useEffect(() => {
+    if (session?.status === "authenticated") {
+      router.push("/dashboard");
+    }
+  });
+
+  const loginUser = async (e) => {
     e.preventDefault();
-    axios
-      .post("/api/register", data)
-      .then(() => toast.success("User has been registered!"))
-      .catch(() => toast.error("Something went wrong!"));
+    signIn("credentials", { ...data, redirect: false }).then((callback) => {
+      if (callback?.error) {
+        toast.error(callback.error);
+      }
+
+      if (callback?.ok && !callback?.error) {
+        toast.success("Logged in successfully!");
+      }
+    });
   };
 
   return (
@@ -37,7 +50,7 @@ export default function Register() {
         </div>
 
         <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
-          <form className="space-y-6" onSubmit={registerUser}>
+          <form className="space-y-6" onSubmit={loginUser}>
             <div>
               <label
                 htmlFor="email"
