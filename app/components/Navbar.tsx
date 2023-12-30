@@ -1,11 +1,20 @@
 "use client";
 import React from "react";
 import Link from "next/link";
+import { useEffect } from "react";
 import { useSession } from "next-auth/react";
 import { signOut } from "next-auth/react";
+import { useRouter } from "next/navigation";
 
 const Navbar = () => {
+  const router = useRouter();
   const session = useSession();
+
+  useEffect(() => {
+    if (session?.status === "authenticated" && router.pathname === "/") {
+      router.push("/dashboard");
+    }
+  }, [session, router]);
   return (
     <div className="navbar bg-sky-200 mt-15">
       <div className="navbar-start">
@@ -52,7 +61,7 @@ const Navbar = () => {
         </a>
       </div>
       <div className="navbar-end">
-        {session?.status === "authenticated" ? (
+        {session?.status === "authenticated" && router.pathname !== "/" ? (
           <button
             onClick={() => signOut()}
             className="bg-red-500 font-semibold text-white px-7 py-3 rounded-xl hover:bg-red-700"
