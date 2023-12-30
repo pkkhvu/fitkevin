@@ -2,9 +2,13 @@ import { NextResponse } from "next/server";
 
 export async function GET(req, res) {
   const { query } = req.query || {};
-  let newQuery = query;
 
-  newQuery = query.replace(/ /g, "%20");
+  if (query) {
+    let newQuery = query;
+    newQuery = query.replace(/ /g, "%20");
+  } else {
+    console.error("Query is undefined");
+  }
 
   // console.log(newQuery);
 
