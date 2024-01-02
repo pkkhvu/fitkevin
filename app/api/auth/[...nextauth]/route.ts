@@ -51,8 +51,9 @@ export const authOptions = {
         if (!passwordMatch) {
           throw new Error("Incorrect password");
         }
-
-        return user;
+        console.log("User object:", user);
+        return JSON.parse(JSON.stringify(user));
+        // return user;
       },
     }),
   ],

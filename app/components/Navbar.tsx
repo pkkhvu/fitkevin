@@ -1,4 +1,5 @@
 "use client";
+
 import React from "react";
 import Link from "next/link";
 import { useEffect } from "react";
@@ -15,64 +16,30 @@ const Navbar = () => {
       router.push("/dashboard");
     }
   }, [session, router]);
+
   return (
-    <div className="navbar bg-sky-200 mt-15">
-      <div className="navbar-start">
-        <div className="dropdown">
-          <div tabIndex={0} role="button" className="btn btn-ghost btn-circle">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              className="h-5 w-5"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth="2"
-                d="M4 6h16M4 12h16M4 18h7"
-              />
-            </svg>
-          </div>
-          <ul
-            tabIndex={0}
-            className="menu menu-sm dropdown-content mt-3 z-[1] p-2 shadow bg-base-100 rounded-box w-52"
+    <nav className="bg-sky-500 p-4">
+      <div className="container mx-auto flex items-center justify-between">
+        <div>
+          <Link
+            href="/"
+            className="text-3xl font-bold text-white hover:text-gray-200"
           >
-            <li>
-              <a>Homepage</a>
-            </li>
-            <li>
-              <a>Portfolio</a>
-            </li>
-            <li>
-              <a>About</a>
-            </li>
-          </ul>
+            Kevin's Calorie Tracker
+          </Link>
+        </div>
+        <div className="flex items-center space-x-4">
+          {session?.status === "authenticated" && router.pathname !== "/" && (
+            <button
+              onClick={() => signOut()}
+              className="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-700 font-bold"
+            >
+              Sign Out
+            </button>
+          )}
         </div>
       </div>
-      <div className="navbar-center">
-        <a className="btn btn-ghost text-xl">
-          {session?.status === "authenticated" ? (
-            <Link href="/dashboard">Kevin's Calorie Tracker</Link>
-          ) : (
-            <Link href="/">Kevin's Calorie Tracker</Link>
-          )}
-        </a>
-      </div>
-      <div className="navbar-end">
-        {session?.status === "authenticated" && router.pathname !== "/" ? (
-          <button
-            onClick={() => signOut()}
-            className="bg-red-500 font-semibold text-white px-7 py-3 rounded-xl hover:bg-red-700"
-          >
-            Sign Out
-          </button>
-        ) : (
-          ""
-        )}
-      </div>
-    </div>
+    </nav>
   );
 };
 

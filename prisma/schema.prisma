@@ -12,7 +12,7 @@ datasource db {
 
 model User {
   id             String    @id @default(auto()) @map("_id") @db.ObjectId
-  name       String?
+  name           String?
   email          String?   @unique
   emailVerified  DateTime?
   image          String?
@@ -20,7 +20,23 @@ model User {
   createdAt      DateTime  @default(now())
   updatedAt      DateTime  @updatedAt
 
-  accounts Account[]
+  foods          Food[]
+
+  accounts       Account[]
+}
+
+model Food {
+  id                     String    @id @default(auto()) @map("_id") @db.ObjectId
+  name                   String
+  calories               Float
+  serving_size_g         Float
+  fat_total_g            Float
+  protein_g              Float
+  carbohydrates_total_g  Float
+  fiber_g                Float
+
+  userId                 String    @db.ObjectId
+  user                   User      @relation(fields: [userId], references: [id])
 }
 
 model Account {
@@ -40,20 +56,4 @@ model Account {
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([provider, providerAccountId])
-}
-
-model Food {
-  id                     String    @id @default(auto()) @map("_id") @db.ObjectId
-  name                   String
-  calories               Float
-  serving_size_g         Float
-  fat_total_g            Float
-  fat_saturated_g        Float
-  protein_g              Float
-  sodium_mg              Int
-  potassium_mg           Int
-  cholesterol_mg         Int
-  carbohydrates_total_g  Float
-  fiber_g                Float
-  sugar_g                Float
 }
