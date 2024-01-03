@@ -10,6 +10,7 @@ import { DatePickerDemo } from "../../components/DatePicker";
 
 export default function DailyTrackYourCalories() {
   const session = useSession();
+  console.log("Session:", session);
   const router = useRouter();
   const [resetDate, setResetDate] = useState(new Date());
   const [foodItem, setFoodItem] = useState(null);
@@ -18,30 +19,16 @@ export default function DailyTrackYourCalories() {
   const [data, setData] = useState({
     name: "",
   });
+  const userToken = session?.data?.user?.id;
 
   useEffect(() => {
     if (session?.status === "authenticated") {
-      router.push("/trackYourCalories");
+      fetchLoggedItems();
+      // router.push("/trackYourCalories");
     } else {
       router.push("/login");
     }
   }, [session, router]);
-
-  useEffect(() => {
-    const fetchLoggedItems = async () => {
-      try {
-        const response = await axios.get("/api/foodItems", {
-          params: { date: selectedDate.toISOString() },
-        });
-
-        setLoggedItems(response.data);
-      } catch (error) {
-        console.error("Error fetching logged items:", error);
-      }
-    };
-
-    fetchLoggedItems();
-  }, [selectedDate]);
 
   const handleDateChange = (daysToAdd) => {
     const newDate = new Date(selectedDate);
@@ -54,23 +41,75 @@ export default function DailyTrackYourCalories() {
     setSelectedDate(selectedDate);
   };
 
+  const fetchLoggedItems = async () => {
+    try {
+      if (userToken) {
+        const response = await axios.post("/api/fetchLoggedFoods", {
+          params: {
+            date: selectedDate.toISOString(),
+            userId: userToken,
+          },
+        });
+        setLoggedItems(response.data);
+      }
+    } catch (error) {
+      console.error("Error fetching logged items:", error);
+    }
+  };
+
+  const saveLoggedFoods = async () => {
+    try {
+      if (userToken) {
+        const response = await axios.post("/api/saveLoggedFoods", {
+          date: selectedDate.toISOString(),
+          userId: userToken,
+        });
+        setLoggedItems(response.data);
+      }
+    } catch (error) {
+      console.error("Error saving logged foods:", error);
+    }
+  };
+
   const logFoodItem = async (e) => {
     e.preventDefault();
+
     try {
-      const response = await axios.get("/api/foodItem", {
-        params: { query: data.name },
-      });
+      if (session?.data?.user?.id) {
+        const response = await axios.get("/api/logFoodItem", {
+          query: data.name,
+        });
 
-      const newFoodItem = response.data.items[0];
-      setLoggedItems((prevItems) => [...prevItems, newFoodItem]);
+        const newFoodItem = response.data.items[0];
 
-      toast.success("Food logged successfully!");
+        if (newFoodItem) {
+          newFoodItem.date = new Date().toISOString();
+          newFoodItem.userId = session.data.user.id;
+
+          const savedFoodItem = await axios.post(
+            "/api/saveLoggedFoods",
+            newFoodItem
+          );
+
+          setLoggedItems((prevItems) => [...prevItems, savedFoodItem.data]);
+
+          toast.success("Food logged successfully!");
+        } else {
+          console.error("Food item data is undefined");
+          toast.error("Unable to log food item");
+        }
+      } else {
+        console.error("Session or user object is missing 'id' property");
+        toast.error("Unable to log food item");
+      }
     } catch (error) {
-      console.error("Error fetching food item:", error);
+      console.error("Error logging food item:", error);
       toast.error("Food not found!");
     }
 
     setData({ name: "" });
+    saveLoggedFoods();
+    fetchLoggedItems();
   };
 
   return (

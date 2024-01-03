@@ -33,7 +33,7 @@ model Food {
   fat_total_g            Float
   protein_g              Float
   carbohydrates_total_g  Float
-  fiber_g                Float
+  date                   DateTime  @default(now())
 
   userId                 String    @db.ObjectId
   user                   User      @relation(fields: [userId], references: [id])

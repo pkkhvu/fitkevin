@@ -57,10 +57,31 @@ export const authOptions = {
       },
     }),
   ],
+
   secret: process.env.SECRET,
   session: {
     strategy: "jwt",
   },
+  callbacks: {
+    session: async ({ session, token }) => {
+      console.log("Session Callback - Token:", token);
+      console.log("Token Structure:", JSON.stringify(token, null, 2));
+      if (token?.uid) {
+        session.user = session.user || {};
+        session.user.id = token.uid;
+        console.log("User ID Set:", session.user.id);
+      }
+      return session;
+    },
+    jwt: async ({ user, token }) => {
+      console.log("JWT Callback - Token:", token);
+      if (user) {
+        token.uid = user.id;
+      }
+      return token;
+    },
+  },
+
   debug: process.env.NODE_ENV === "development",
 };
 
