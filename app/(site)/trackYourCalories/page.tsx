@@ -10,7 +10,7 @@ import { DatePickerDemo } from "../../components/DatePicker";
 
 export default function DailyTrackYourCalories() {
   const session = useSession();
-  console.log("Session:", session);
+  // console.log("Session:", session);
   const router = useRouter();
   const [resetDate, setResetDate] = useState(new Date());
   const [foodItem, setFoodItem] = useState(null);
@@ -76,11 +76,11 @@ export default function DailyTrackYourCalories() {
 
     try {
       if (session?.data?.user?.id) {
-        const response = await axios.get("/api/logFoodItem", {
-          query: data.name,
+        const response = await axios.post("/api/logFoodItem", {
+          name: data.name,
         });
 
-        const newFoodItem = response.data.items[0];
+        const newFoodItem = response.data.items?.[0]; // Check if items array exists
 
         if (newFoodItem) {
           newFoodItem.date = new Date().toISOString();
@@ -108,7 +108,6 @@ export default function DailyTrackYourCalories() {
     }
 
     setData({ name: "" });
-    saveLoggedFoods();
     fetchLoggedItems();
   };
 

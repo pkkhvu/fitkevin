@@ -1,8 +1,8 @@
 import { NextResponse } from "next/server";
 
 export async function GET(req, res) {
-  // const { query } = req.query || {};
-  // console.log(query);
+  const { query } = req.query || {};
+  console.log(query);
   // console.log(req);
   let url = new URL(req.url);
   let searchParams = new URLSearchParams(url.search);

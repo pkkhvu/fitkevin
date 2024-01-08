@@ -6,20 +6,18 @@ export async function POST(request) {
 
   try {
     // Check if the food item for the given user and date already exists
-    const existingFoodItem = await prisma.food.findUnique({
+    const existingFoodItem = await prisma.food.findMany({
       where: {
-        userId_date: {
-          userId: body.userId,
-          date: body.date,
-        },
+        userId: body.userId,
+        date: body.date,
       },
     });
 
-    // If the food item already exists, update it
-    if (existingFoodItem) {
+    // If the food item already exists, update the first one (you might want to handle multiple matches differently)
+    if (existingFoodItem.length > 0) {
       const updatedFoodItem = await prisma.food.update({
         where: {
-          id: existingFoodItem.id,
+          id: existingFoodItem[0]?.id, // Use optional chaining to handle undefined
         },
         data: {
           // Update any fields you want here
