@@ -10,7 +10,7 @@ import { DatePickerDemo } from "../../components/DatePicker";
 
 export default function DailyTrackYourCalories() {
   const session = useSession();
-  // console.log("Session:", session);
+  // const { data: session } = useSession();
   const router = useRouter();
   const [resetDate, setResetDate] = useState(new Date());
   const [foodItem, setFoodItem] = useState(null);
@@ -23,48 +23,76 @@ export default function DailyTrackYourCalories() {
 
   useEffect(() => {
     if (session?.status === "authenticated") {
-      fetchLoggedItems();
-      // router.push("/trackYourCalories");
+      if (userToken && selectedDate) {
+        fetchLoggedItems(userToken, selectedDate.toISOString());
+        router.push("/trackYourCalories");
+      } else {
+        console.error("userId or selectedDate is undefined on the client-side");
+      }
     } else {
       router.push("/login");
     }
-  }, [session, router]);
+  }, [session, router, userToken, selectedDate]);
 
-  const handleDateChange = (daysToAdd) => {
-    const newDate = new Date(selectedDate);
-    newDate.setDate(selectedDate.getDate() + daysToAdd);
-    setSelectedDate(newDate);
-    setResetDate(newDate);
-  };
-
-  const handleDatePickerSelect = (selectedDate) => {
-    setSelectedDate(selectedDate);
-  };
-
-  const fetchLoggedItems = async () => {
+  const fetchLoggedItems = async (userId, selectedDate) => {
     try {
-      if (userToken) {
-        const response = await axios.post("/api/fetchLoggedFoods", {
-          params: {
-            date: selectedDate.toISOString(),
-            userId: userToken,
-          },
-        });
-        setLoggedItems(response.data);
+      const response = await fetch(
+        `/api/fetchLoggedFoods?userId=${userId}&date=${selectedDate}.split("T")[0]`
+      );
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(`Error fetching food items: ${data}`);
       }
+
+      return data;
     } catch (error) {
-      console.error("Error fetching logged items:", error);
+      console.error("Error fetching:", error);
+      throw new Error(`Error fetching food items: ${error.message}`);
     }
   };
 
-  const saveLoggedFoods = async () => {
+  //   try {
+  //     if (userToken && selectedDate) {
+
+  //       const response = await axios.get("/api/fetchLoggedFoods", {
+  //         params: {
+  //           userId: userToken,
+  //           date: selectedDate.toISOString(),
+  //         },
+  //       });
+
+  //       let itemsArray = [];
+
+  //       if (response.data) {
+  //         itemsArray = Array.isArray(response.data)
+  //           ? response.data
+  //           : [response.data];
+  //       }
+
+  //       console.log("Fetched items:", itemsArray);
+  //       setLoggedItems(itemsArray);
+  //     }
+  //   } catch (error) {
+  //     console.error("Error fetching logged items:", error);
+  //   }
+  // };
+
+  const saveLoggedFoods = async (newFoodItem) => {
     try {
       if (userToken) {
         const response = await axios.post("/api/saveLoggedFoods", {
           date: selectedDate.toISOString(),
           userId: userToken,
+          name: newFoodItem.name,
+          calories: newFoodItem.calories,
+          serving_size_g: newFoodItem.serving_size_g,
+          fat_total_g: newFoodItem.fat_total_g,
+          protein_g: newFoodItem.protein_g,
+          carbohydrates_total_g: newFoodItem.carbohydrates_total_g,
         });
-        setLoggedItems(response.data);
+        setLoggedItems([response.data]);
       }
     } catch (error) {
       console.error("Error saving logged foods:", error);
@@ -75,25 +103,41 @@ export default function DailyTrackYourCalories() {
     e.preventDefault();
 
     try {
-      if (session?.data?.user?.id) {
-        const response = await axios.post("/api/logFoodItem", {
-          name: data.name,
-        });
+      if (userToken) {
+        const response = await axios.get(
+          `https://api.calorieninjas.com/v1/nutrition?query=${data.name}`,
+          {
+            headers: {
+              "X-Api-Key": "TByYBljJw3LknfD25GSpoA==T1XqX3zvPnVPADLH",
+              "Content-Type": "application/json",
+            },
+          }
+        );
 
-        const newFoodItem = response.data.items?.[0]; // Check if items array exists
+        const newFoodItems = Array.isArray(response.data.items)
+          ? response.data.items
+          : [response.data.items];
 
-        if (newFoodItem) {
+        if (newFoodItems && newFoodItems.length > 0) {
+          const newFoodItem = response.data?.items?.[0];
+
           newFoodItem.date = new Date().toISOString();
           newFoodItem.userId = session.data.user.id;
 
-          const savedFoodItem = await axios.post(
-            "/api/saveLoggedFoods",
-            newFoodItem
-          );
+          newFoodItem.name = newFoodItem.name || "Unknown Food";
+          newFoodItem.calories = newFoodItem.calories || 0;
+          newFoodItem.serving_size_g = newFoodItem.serving_size_g || 0;
+          newFoodItem.fat_total_g = newFoodItem.fat_total_g || 0;
+          newFoodItem.protein_g = newFoodItem.protein_g || 0;
+          newFoodItem.carbohydrates_total_g =
+            newFoodItem.carbohydrates_total_g || 0;
 
-          setLoggedItems((prevItems) => [...prevItems, savedFoodItem.data]);
-
+          setLoggedItems((prevItems) => [...prevItems, newFoodItem]);
           toast.success("Food logged successfully!");
+
+          console.log(newFoodItem);
+          saveLoggedFoods(newFoodItem);
+          return newFoodItem;
         } else {
           console.error("Food item data is undefined");
           toast.error("Unable to log food item");
@@ -106,9 +150,18 @@ export default function DailyTrackYourCalories() {
       console.error("Error logging food item:", error);
       toast.error("Food not found!");
     }
-
     setData({ name: "" });
-    fetchLoggedItems();
+  };
+
+  const handleDateChange = (daysToAdd) => {
+    const newDate = new Date(selectedDate);
+    newDate.setDate(selectedDate.getDate() + daysToAdd);
+    setSelectedDate(newDate);
+    setResetDate(newDate);
+  };
+
+  const handleDatePickerSelect = (selectedDate) => {
+    setSelectedDate(selectedDate);
   };
 
   return (

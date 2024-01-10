@@ -1,16 +1,22 @@
 import { NextResponse } from "next/server";
+import { parse } from "url";
+import { parse as parseQuery } from "querystring";
 
-export async function GET(req, res) {
-  const { query } = req.query || {};
-  console.log(query);
-  // console.log(req);
+export async function POST(req, res) {
+  // const query = req.body.query || {};
+  console.log(req);
+  const { name } = req.body;
+  console.log(name);
+  // console.log(query);
   let url = new URL(req.url);
+  console.log(url);
   let searchParams = new URLSearchParams(url.search);
   console.log(searchParams.get("query"));
   let newQuery = searchParams.get("query");
-
   console.log(newQuery);
 
+  const { query: queryParams } = parse(req.url, true);
+  console.log(queryParams.query);
   try {
     const response = await fetch(
       `https://api.calorieninjas.com/v1/nutrition?query=${newQuery}`,

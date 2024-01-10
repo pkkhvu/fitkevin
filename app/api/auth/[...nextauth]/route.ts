@@ -51,7 +51,7 @@ export const authOptions = {
         if (!passwordMatch) {
           throw new Error("Incorrect password");
         }
-        console.log("User object:", user);
+        // console.log("User object:", user);
         return JSON.parse(JSON.stringify(user));
         // return user;
       },
@@ -64,17 +64,17 @@ export const authOptions = {
   },
   callbacks: {
     session: async ({ session, token }) => {
-      console.log("Session Callback - Token:", token);
-      console.log("Token Structure:", JSON.stringify(token, null, 2));
+      // console.log("Session Callback - Token:", token);
+      // console.log("Token Structure:", JSON.stringify(token, null, 2));
       if (token?.uid) {
         session.user = session.user || {};
         session.user.id = token.uid;
-        console.log("User ID Set:", session.user.id);
+        // console.log("User ID Set:", session.user.id);
       }
       return session;
     },
     jwt: async ({ user, token }) => {
-      console.log("JWT Callback - Token:", token);
+      // console.log("JWT Callback - Token:", token);
       if (user) {
         token.uid = user.id;
       }

@@ -3,6 +3,7 @@ import { NextResponse } from "next/server";
 
 export async function POST(request) {
   const body = await request.json();
+  // console.log("Request Body:", body);
 
   try {
     const savedFoodItem = await prisma.food.create({

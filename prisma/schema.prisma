@@ -28,7 +28,7 @@ model User {
 model Food {
   id                     String    @id @default(auto()) @map("_id") @db.ObjectId
   name                   String?
-  calories               Float
+  calories               Float?
   serving_size_g         Float
   fat_total_g            Float
   protein_g              Float
